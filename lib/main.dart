@@ -5,6 +5,9 @@ import 'package:recipe_suggestion/firebase_options.dart';
 // import 'package:eatnfit/provider/welcome.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+// to upload on github and save changes: https://youtu.be/Hu9wpHHJAPU?si=nNqOjETo0RerINQh
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
