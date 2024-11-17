@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+//import 'navigation_bar.dart';
 //import 'homepage.dart';
 
 // import 'package:flutter/material.dart';
@@ -159,6 +160,7 @@ class _AddItemPageState extends State<AddItem> {
           ),
         ),
       ),
+    //  bottomNavigationBar: BottomNavigationBar(currentIndex: 0),
     );
   }
 

@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'homepage.dart';
+import 'package:recipe_suggestion/shop_list.dart';
+//import 'package:recipe_suggestion/instructions.dart';
+//import 'package:recipe_suggestion/suggestion_recipe.dart';
+//import 'package:recipe_suggestion/add_item.dart';
+//import 'package:recipe_suggestion/suggestion_recipe.dart';
+//import 'homepage.dart';
 import 'package:recipe_suggestion/firebase_options.dart';
 // import 'package:eatnfit/provider/home.dart';
 // import 'package:eatnfit/provider/welcome.dart';
@@ -45,7 +50,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: homepage(),
+      home: ShopList(),
     );
   }
 }
