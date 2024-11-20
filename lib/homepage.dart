@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:recipe_suggestion/navigationBar.dart';
+//import 'package:recipe_suggestion/shop_list.dart';
+//import 'package:recipe_suggestion/suggestion_recipe.dart';
 //import 'homepage_controller.dart' as functions;
 import 'add_item.dart';
 //import 'functions.dart' as functions;
@@ -13,6 +16,15 @@ class homepage extends StatefulWidget {
 }
 
 class _HomePageState extends State<homepage> {
+  //-------------------------------------------
+   int _selectedIndex = 0;
+
+  void _onItemTapped(int index){
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+  //-------------------------------------------
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> expiringSoonItems = items.where((item) {
@@ -73,23 +85,12 @@ class _HomePageState extends State<homepage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt),
-            label: 'Recipe',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'SmartStock',
-          ),
-        ],
+      //-------------------------------------------------
+      bottomNavigationBar: SharedBottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
+      //------------------------------------------------- 
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.push(

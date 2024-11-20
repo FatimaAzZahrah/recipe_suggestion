@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:recipe_suggestion/navigationBar.dart';
 
-class Instructions extends StatelessWidget {
+class Instructions extends StatefulWidget{
   final String recipeName;
 
   Instructions({required this.recipeName});
+  @override
+  _InstructionsState createState() => _InstructionsState();
+}
+
+class _InstructionsState extends State<Instructions> {
+  int _selectedIndex = 1;
+
+  void _onItemTapped(int index){
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +37,7 @@ class Instructions extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              recipeName,
+              widget.recipeName,
               style: const TextStyle(
                 fontSize: 24.0,
                 fontWeight: FontWeight.bold,
@@ -75,24 +88,28 @@ class Instructions extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        selectedItemColor: Colors.teal,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt),
-            label: 'Recipe',
-          //  backgroundColor: Colors.teal,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'SmartStock',
-          ),
-        ],
+      // bottomNavigationBar: BottomNavigationBar(
+      //   currentIndex: 1,
+      //   selectedItemColor: Colors.teal,
+      //   items: const [
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.home),
+      //       label: 'Home',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.receipt),
+      //       label: 'Recipe',
+        
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.shopping_cart),
+      //       label: 'SmartStock',
+      //     ),
+      //   ],
+      // ),
+       bottomNavigationBar: SharedBottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }

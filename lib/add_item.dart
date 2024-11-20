@@ -159,8 +159,7 @@ class _AddItemPageState extends State<AddItem> {
             ],
           ),
         ),
-      ),
-    //  bottomNavigationBar: BottomNavigationBar(currentIndex: 0),
+      )
     );
   }
 

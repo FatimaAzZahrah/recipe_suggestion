@@ -1,8 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_suggestion/instructions.dart';
+import 'package:recipe_suggestion/navigationBar.dart';
 //import 'package:recipe_suggestion/custom_item.dart';
 
-class SuggestionRecipe extends StatelessWidget {
+class SuggestionRecipe extends StatefulWidget {
+  @override
+  _SuggestionRecipeState createState() => _SuggestionRecipeState();
+
+}
+
+class _SuggestionRecipeState extends State <SuggestionRecipe>{
+
+  int _selectedIndex = 1;
+
+  void _onItemTapped(int index){
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,23 +78,27 @@ class SuggestionRecipe extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        selectedItemColor: Colors.teal,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt),
-            label: 'Recipe',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'SmartStock',
-          ),
-        ],
+      // bottomNavigationBar: BottomNavigationBar(
+      //   currentIndex: 1,
+      //   selectedItemColor: Colors.teal,
+      //   items: const [
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.home),
+      //       label: 'Home',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.receipt),
+      //       label: 'Recipe',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.shopping_cart),
+      //       label: 'SmartStock',
+      //     ),
+      //   ],
+      // ),
+       bottomNavigationBar: SharedBottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }

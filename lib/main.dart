@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:recipe_suggestion/shop_list.dart';
+//import 'package:recipe_suggestion/shop_list.dart';
+//import 'package:recipe_suggestion/login.dart';
+import 'package:recipe_suggestion/signup.dart';
 //import 'package:recipe_suggestion/instructions.dart';
 //import 'package:recipe_suggestion/suggestion_recipe.dart';
 //import 'package:recipe_suggestion/add_item.dart';
@@ -50,7 +52,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: ShopList(),
+      home: SignUp(),
     );
   }
 }

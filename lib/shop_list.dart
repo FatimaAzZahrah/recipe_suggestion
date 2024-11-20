@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:recipe_suggestion/navigationBar.dart';
 
 class ShopList extends StatefulWidget {
   @override
@@ -11,6 +12,14 @@ class _ShopListState extends State<ShopList> {
     {'name': 'Sweet Potato Flour', 'isSelected': false},
     {'name': 'Ice Cubes', 'isSelected': false},
   ];
+
+  int _selectedIndex = 2;
+
+  void _onItemTapped(int index){
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,23 +81,27 @@ class _ShopListState extends State<ShopList> {
         child: const Icon(Icons.add),
         backgroundColor: Colors.teal,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2,
-        selectedItemColor: Colors.teal,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt),
-            label: 'Recipe',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'SmartStock',
-          ),
-        ],
+      // bottomNavigationBar: BottomNavigationBar(
+      //   currentIndex: 2,
+      //   selectedItemColor: Colors.teal,
+      //   items: const [
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.home),
+      //       label: 'Home',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.receipt),
+      //       label: 'Recipe',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.shopping_cart),
+      //       label: 'SmartStock',
+      //     ),
+      //   ],
+      // ),
+       bottomNavigationBar: SharedBottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }
