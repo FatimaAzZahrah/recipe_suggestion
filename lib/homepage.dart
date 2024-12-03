@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_suggestion/navigationBar.dart';
-//import 'package:recipe_suggestion/shop_list.dart';
-//import 'package:recipe_suggestion/suggestion_recipe.dart';
-//import 'homepage_controller.dart' as functions;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'add_item.dart';
-//import 'functions.dart' as functions;
-
-//import 'package:flutter/material.dart';
-//import 'add_item_page.dart';
-//import 'functions.dart' as functions;
 
 class homepage extends StatefulWidget {
   @override
@@ -16,23 +10,17 @@ class homepage extends StatefulWidget {
 }
 
 class _HomePageState extends State<homepage> {
-  //-------------------------------------------
-   int _selectedIndex = 0;
+  int _selectedIndex = 0;
 
-  void _onItemTapped(int index){
+  void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
-  //-------------------------------------------
+
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> expiringSoonItems = items.where((item) {
-      if (item['expiryDate'] == null) return false;
-      DateTime expiryDate = item['expiryDate'];
-      DateTime now = DateTime.now();
-      return expiryDate.isAfter(now) && expiryDate.isBefore(now.add(Duration(days: 3)));
-    }).toList();
+    User? user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
       appBar: AppBar(
@@ -54,43 +42,90 @@ class _HomePageState extends State<homepage> {
             const SizedBox(height: 10.0),
             Container(
               height: 120.0,
-              child: expiringSoonItems.isEmpty
-                  ? Center(child: Text('No expired food yet'))
-                  : ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: expiringSoonItems.map((item) => ExpiringItemCard(itemName: item['name'], expiryDate: '${item['expiryDate'].day}/${item['expiryDate'].month}/${item['expiryDate'].year}')).toList(),
-                    ),
+              child: user != null
+                  ? StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(user.uid)
+                          .collection('items')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                        final items = snapshot.data!.docs;
+                        final expiringSoonItems = items.where((document) {
+                          DateTime? expiryDate = document['expiryDate']?.toDate();
+                          if (expiryDate == null) return false;
+                          DateTime now = DateTime.now();
+                          return expiryDate.isAfter(now) &&
+                              expiryDate.isBefore(now.add(Duration(days: 5)));
+                        }).toList();
+                        if (expiringSoonItems.isEmpty) {
+                          return Center(child: Text('No items expiring soon.'));
+                        }
+                        return ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: expiringSoonItems.map((document) {
+                            Map<String, dynamic> data =
+                                document.data() as Map<String, dynamic>;
+                            return ExpiringItemCard(
+                              itemName: data['name'],
+                              expiryDate: data['expiryDate'] != null
+                                  ? '${data['expiryDate'].toDate().day}/${data['expiryDate'].toDate().month}/${data['expiryDate'].toDate().year}'
+                                  : 'No Expiry',
+                            );
+                          }).toList(),
+                        );
+                      },
+                    )
+                  : Center(child: Text('Please log in to view items.')),
             ),
             const SizedBox(height: 20.0),
             const Text(
-              'List of Food',
+              'List of Food in the Fridge',
               style: TextStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 10.0),
-            FoodCategoryTabs(),
             Expanded(
-              child: items.isEmpty
-                  ? Center(child: Text('No item added yet'))
-                  : ListView(
-                      children: items.map((item) => FoodItemCard(
-                            itemName: item['name'],
-                            expiryDate: '${item['expiryDate'].day}/${item['expiryDate'].month}/${item['expiryDate'].year}',
-                            quantity: item['quantity'].toString(),
-                          )).toList(),
-                    ),
+              child: user != null
+                  ? StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(user.uid)
+                          .collection('items')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                        final items = snapshot.data!.docs;
+                        if (items.isEmpty) {
+                          return Center(child: Text('No items found.'));
+                        }
+                        return ListView(
+                          children: items.map((document) {
+                            Map<String, dynamic> data =
+                                document.data() as Map<String, dynamic>;
+                            return FoodItemCard(
+                              itemName: data['name'],
+                              expiryDate: data['expiryDate'] != null
+                                  ? '${data['expiryDate'].toDate().day}/${data['expiryDate'].toDate().month}/${data['expiryDate'].toDate().year}'
+                                  : 'No Expiry',
+                              quantity: data['quantity'].toString(),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    )
+                  : Center(child: Text('Please log in to view items.')),
             ),
           ],
         ),
       ),
-      //-------------------------------------------------
-      bottomNavigationBar: SharedBottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-      ),
-      //------------------------------------------------- 
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.push(
@@ -101,6 +136,10 @@ class _HomePageState extends State<homepage> {
         },
         child: const Icon(Icons.add),
         backgroundColor: Colors.teal,
+      ),
+      bottomNavigationBar: SharedBottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }
@@ -142,49 +181,15 @@ class ExpiringItemCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 5.0),
-            Text('Expiry: $expiryDate',
-                style: const TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.red,
-                )),
+            Text(
+              'Expiry: $expiryDate',
+              style: const TextStyle(
+                fontSize: 14.0,
+                color: Colors.red,
+              ),
+            ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class FoodCategoryTabs extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 50.0,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          CategoryTab(name: 'All'),
-          CategoryTab(name: 'Vegetables'),
-          CategoryTab(name: 'Fruits'),
-          CategoryTab(name: 'Meat'),
-          CategoryTab(name: 'Dairy'),
-        ],
-      ),
-    );
-  }
-}
-
-class CategoryTab extends StatelessWidget {
-  final String name;
-
-  CategoryTab({required this.name});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Chip(
-        label: Text(name),
-        backgroundColor: Colors.teal.withOpacity(0.1),
       ),
     );
   }
@@ -222,5 +227,3 @@ class FoodItemCard extends StatelessWidget {
     );
   }
 }
-
-List<Map<String, dynamic>> items = [];

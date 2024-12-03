@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 //import 'navigation_bar.dart';
 //import 'homepage.dart';
 
@@ -163,16 +165,28 @@ class _AddItemPageState extends State<AddItem> {
     );
   }
 
-  void _saveItem() {
-    // Save item data to the global items list
-    items.add({
-      'name': _itemName,
-      'category': _category,
-      'expiryDate': _expiryDate,
-      'quantity': _quantity,
-      'notes': _notes,
-    });
+  void _saveItem() async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance.collection('users')
+          .doc(user.uid)
+          .collection('items')
+          .add({
+        'name': _itemName,
+        'category': _category,
+        'expiryDate': _expiryDate,
+        'quantity': _quantity,
+        'notes': _notes,
+        'created_at': FieldValue.serverTimestamp(),
+      });
+      print("Item saved successfully!");
+    }
+  } catch (e) {
+    print("Failed to save item: $e");
   }
+}
+
 }
 
 List<Map<String, dynamic>> items = [];
